@@ -66,11 +66,20 @@ const enum TotalCells {
 }
 
 const getNextMonthDays = (year: number, month: number) => {
+  //Вынести в функцию
+  const lastDayOfCurrentMonth = new Date(year, month + 1);
+  lastDayOfCurrentMonth.setMinutes(-1);
+  const numberDayInWeek = lastDayOfCurrentMonth;
+  const isLastDayInMonth =
+    numberDayInWeek.getDate() === 31 && numberDayInWeek.getDay() === 1;
+
   const currentMonthFirstDay = new Date(year, month);
   //получаем день недели первого дня месяца
-  const dayOfTheWeek = currentMonthFirstDay.getDay();
-  const prevMonthCellsAmount = dayOfTheWeek - 1;
+  const dayOfTheWeek = isLastDayInMonth
+    ? currentMonthFirstDay.getDay() - 7
+    : currentMonthFirstDay.getDay();
 
+  const prevMonthCellsAmount = dayOfTheWeek - 1;
   const daysAmount = getDaysAmountInMonth(year, month);
 
   const nextMonthDays = TotalCells.TOTAL - daysAmount - prevMonthCellsAmount;
@@ -164,7 +173,7 @@ const DatePicker: FC<IDatePicker> = ({ date }) => {
 
   return (
     <div>
-      {day}.{months[panelMonth]}.{year}
+      {day}.{months[panelMonth]}.{panelYear}
       <div>
         <button onClick={prevYear}>Prev Year</button>
         <button onClick={prevMonth}>Prev Month</button>
@@ -206,7 +215,9 @@ const DatePicker: FC<IDatePicker> = ({ date }) => {
               style={{
                 cursor: "pointer",
                 backgroundColor:
-                  selectDate.day === el.day && selectDate.month === el.month
+                  selectDate.day === el.day &&
+                  selectDate.month === el.month &&
+                  selectDate.year === el.year
                     ? "red"
                     : "",
               }}
